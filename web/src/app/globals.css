@@ -6,11 +6,7 @@
   :root { --background: #0a0a0a; --foreground: #ededed; }
 }
 
-/* Ẩn scrollbar trên thiết bị cảm ứng, giữ scrollbar trên desktop */
-@media (hover: none) and (pointer: coarse) {
-  .touch-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  .touch-no-scrollbar::-webkit-scrollbar { display: none; }
-}
+
 
 /* Khi đang drag, đổi con trỏ cho “cảm giác kéo” tốt hơn */
 .dragging { cursor: grabbing; cursor: -webkit-grabbing; }

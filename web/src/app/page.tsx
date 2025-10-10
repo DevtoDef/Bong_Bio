@@ -186,7 +186,7 @@ function HScrollRow({ children }: { children: React.ReactNode }) {
   };
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (!ref.current) return;
-    // Lăn dọc để cuộn ngang cho tiện dùng chuột
+    // map lăn dọc -> cuộn ngang
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
       ref.current.scrollLeft += e.deltaY;
       e.preventDefault();
@@ -198,7 +198,7 @@ function HScrollRow({ children }: { children: React.ReactNode }) {
     <div className="relative">
       <div
         ref={ref}
-        className="flex gap-3 overflow-x-auto flex-nowrap touch-pan-x select-none px-5 py-4 touch-no-scrollbar"
+        className="flex gap-3 overflow-x-auto flex-nowrap touch-pan-x select-none px-5 py-4 no-scrollbar cursor-grab active:cursor-grabbing"
         onMouseDown={onDown}
         onMouseUp={onUpLeave}
         onMouseLeave={onUpLeave}
@@ -210,11 +210,9 @@ function HScrollRow({ children }: { children: React.ReactNode }) {
         {children}
       </div>
 
-      {/* Gradients mép trái/phải chỉ hiện trên desktop */}
+      {/* mép mờ + nút mũi tên (desktop) */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-pink-100/90 to-transparent hidden md:block" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-pink-100/90 to-transparent hidden md:block" />
-
-      {/* Nút mũi tên điều hướng (desktop) */}
       <button
         aria-label="Scroll left"
         className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 shadow ring-1 ring-black/5 items-center justify-center hover:bg-white"
