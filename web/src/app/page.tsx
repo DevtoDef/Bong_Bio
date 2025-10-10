@@ -165,6 +165,73 @@ function IconBtn({
 }
 
 
+function HScrollRow({ children }: { children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const st = React.useRef({ down: false, startX: 0, sl: 0 });
+
+  const onDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    st.current.down = true;
+    st.current.startX = e.pageX;
+    st.current.sl = ref.current?.scrollLeft || 0;
+    ref.current?.classList.add('dragging');
+  };
+  const onUpLeave = () => {
+    st.current.down = false;
+    ref.current?.classList.remove('dragging');
+  };
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!st.current.down || !ref.current) return;
+    const dx = e.pageX - st.current.startX;
+    ref.current.scrollLeft = st.current.sl - dx;
+  };
+  const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    // Lăn dọc để cuộn ngang cho tiện dùng chuột
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      ref.current.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  };
+  const scrollBy = (dx: number) => ref.current?.scrollBy({ left: dx, behavior: 'smooth' });
+
+  return (
+    <div className="relative">
+      <div
+        ref={ref}
+        className="flex gap-3 overflow-x-auto flex-nowrap touch-pan-x select-none px-5 py-4 touch-no-scrollbar"
+        onMouseDown={onDown}
+        onMouseUp={onUpLeave}
+        onMouseLeave={onUpLeave}
+        onMouseMove={onMove}
+        onWheel={onWheel}
+        role="region"
+        aria-label="Bộ lọc danh mục"
+      >
+        {children}
+      </div>
+
+      {/* Gradients mép trái/phải chỉ hiện trên desktop */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-pink-100/90 to-transparent hidden md:block" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-pink-100/90 to-transparent hidden md:block" />
+
+      {/* Nút mũi tên điều hướng (desktop) */}
+      <button
+        aria-label="Scroll left"
+        className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 shadow ring-1 ring-black/5 items-center justify-center hover:bg-white"
+        onClick={() => scrollBy(-280)}
+      >
+        <ChevronLeft className="w-5 h-5 text-black" />
+      </button>
+      <button
+        aria-label="Scroll right"
+        className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-white/90 shadow ring-1 ring-black/5 items-center justify-center hover:bg-white"
+        onClick={() => scrollBy(280)}
+      >
+        <ChevronRight className="w-5 h-5 text-black" />
+      </button>
+    </div>
+  );
+}
 
 /* ================== HEADER ================== */
 function Header() {
@@ -423,16 +490,17 @@ export default function Page() {
         </div>
 
         {/* Chips: không xuống dòng, kéo ngang */}
-        <div className="flex gap-3 overflow-x-auto flex-nowrap no-scrollbar py-4">
-          <Chip active={activeCat === 'All'} onClick={() => setActiveCat('All')}>
-            All ({allCount})
-          </Chip>
-          {categories.map((c) => (
-            <Chip key={c.name} active={activeCat === c.name} onClick={() => setActiveCat(c.name)}>
-              {c.name} ({c.count})
-            </Chip>
-          ))}
-        </div>
+        <HScrollRow>
+  <Chip active={activeCat === 'All'} onClick={() => setActiveCat('All')}>
+    All ({allCount})
+  </Chip>
+  {categories.map((c) => (
+    <Chip key={c.name} active={activeCat === c.name} onClick={() => setActiveCat(c.name)}>
+      {c.name} ({c.count})
+    </Chip>
+  ))}
+</HScrollRow>
+
 
         {/* Groups */}
         <div className="pb-8">
